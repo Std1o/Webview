@@ -20,10 +20,6 @@ import static com.stdio.webview.WebViewHelper.cameraUri;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String contextPath;
-    private String originalCookiePath;
-    private String myCookieDbPath;
-
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -54,12 +50,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        String extDir = Environment.getExternalStorageDirectory().getPath();
-
-        myCookieDbPath = extDir + "/MyCookies";
-        contextPath = "/data/data/" + getApplicationContext().getPackageName() + "/";
-        originalCookiePath = contextPath + "app_webview/Cookies";
         initView();
     }
 
