@@ -14,42 +14,24 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
+import android.widget.ProgressBar;
 
 import static com.stdio.webview.WebViewHelper.afterChosePic;
 import static com.stdio.webview.WebViewHelper.cameraUri;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Storage Permissions
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
-
     public static final String TAG = "MainActivity";
     public static final int REQUEST_CAMERA = 1;
     public static final int REQUEST_CHOOSE = 2;
-    private WebView mWebView;
-
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
-        }
-    }
+    public static WebView mWebView;
+    public static ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        progressBar = findViewById(R.id.progressBar);
         initView();
     }
 
@@ -76,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         mWebView.setScrollbarFadingEnabled(false);
         mWebView.loadUrl("https://vk.com");
-        verifyStoragePermissions(this);
     }
 
     @Override
