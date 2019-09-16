@@ -14,28 +14,9 @@ import static com.stdio.webview.MainActivity.TAG;
 
 public class MyWebViewClient extends WebViewClient {
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        return handleUri(view, url);
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-        String url = request.getUrl().toString();
-        return handleUri(view, url);
-    }
-
-    private boolean handleUri(WebView view, String url) {
-        view.loadUrl(url);
-        return true;
-    }
-
     public MyWebViewClient() {
         super();
     }
-
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -53,5 +34,4 @@ public class MyWebViewClient extends WebViewClient {
         MainActivity.mWebView.setVisibility(View.VISIBLE);
         super.onPageFinished(view, url);
     }
-
 }
