@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -55,7 +56,13 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url2));
                     intent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)
                             .setPackage("com.whatsapp");
-                    startActivity(intent);
+                    try {
+                        startActivity(intent);
+                    }
+                    catch (ActivityNotFoundException e) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp")));
+                        mWebView.goBack();
+                    }
                 }
                 else if (url.startsWith("whatsapp://send?text=")) {
                     Uri uri=Uri.parse(url);
@@ -65,17 +72,35 @@ public class MainActivity extends AppCompatActivity {
                     sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
                     sendIntent.setType("text/plain");
                     sendIntent.setPackage("com.whatsapp");
-                    startActivity(sendIntent);
+                    try {
+                        startActivity(sendIntent);
+                    }
+                    catch (ActivityNotFoundException e) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp")));
+                        mWebView.goBack();
+                    }
                 }
                 else if (url.startsWith("viber:")) {
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             Uri.parse(url));
-                    startActivity(intent);
+                    try {
+                        startActivity(intent);
+                    }
+                    catch (ActivityNotFoundException e) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.viber.voip")));
+                        mWebView.goBack();
+                    }
                 }
                 else if (url.startsWith("https://telegram.me/share")) {
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             Uri.parse(url));
-                    startActivity(intent);
+                    try {
+                        startActivity(intent);
+                    }
+                    catch (ActivityNotFoundException e) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=org.telegram.messenger")));
+                        mWebView.goBack();
+                    }
                 }
                 else if (url.startsWith("http:") || url.startsWith("https:")) {
                     view.loadUrl(url);
