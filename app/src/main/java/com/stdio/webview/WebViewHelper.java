@@ -29,9 +29,6 @@ public class WebViewHelper {
     }
 
     public void selectImage() {
-        if (!FileUtils.checkSDcard(context)) {
-            return;
-        }
         String[] selectPicTypeStr = {"Фото", "Галерея"};
         new AlertDialog.Builder(context)
                 .setOnCancelListener(new ReOnCancelListener())
@@ -40,11 +37,11 @@ public class WebViewHelper {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
-                                    // 相机拍摄
+                                    // make photo
                                     case 0:
-                                        openCarcme();
+                                        openCamera();
                                         break;
-                                    // 手机相册
+                                    // open gallery
                                     case 1:
                                         chosePicture();
                                         break;
@@ -62,11 +59,6 @@ public class WebViewHelper {
         activity.startActivityForResult(wrapperIntent, REQUEST_CHOOSE);
     }
 
-    /**
-     * 选择照片后结束
-     *
-     * @param data
-     */
     public static Uri afterChosePic(Intent data) {
         if (data != null) {
             final String path = data.getData().getPath();
@@ -77,14 +69,12 @@ public class WebViewHelper {
         return null;
     }
 
-    /**
-     * 打开照相机
-     */
-    private void openCarcme() {
+    private void openCamera() {
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        String imagePaths = Environment.getExternalStorageDirectory().getPath() + "/BigMoney/Images/" + (System.currentTimeMillis() + ".jpg");
-        // 必须确保文件夹路径存在，否则拍照后无法完成回调
+        String imagePaths = Environment.getExternalStorageDirectory().getPath() + "/" + context.getResources().getString(R.string.app_name) + "/Images/" + (System.currentTimeMillis() + ".jpg");
+        // Make sure the folder exists, otherwise the call will not be called
+        System.out.println(imagePaths);
         File vFile = new File(imagePaths);
         if (!vFile.exists()) {
             File vDirPath = vFile.getParentFile();
@@ -99,20 +89,6 @@ public class WebViewHelper {
         activity.startActivityForResult(intent, REQUEST_CAMERA);
     }
 
-
-    /**
-     * 返回文件选择
-     */
-
-
-
-    /**
-     * 5.0以后机型 返回文件选择
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
     public void onActivityResultAboveL(int requestCode, int resultCode, Intent data) {
 
         Uri[] results = null;
@@ -136,7 +112,7 @@ public class WebViewHelper {
 
 
     /**
-     * dialog监听类
+     * Dialog listener
      */
     private class ReOnCancelListener implements DialogInterface.OnCancelListener {
         @Override

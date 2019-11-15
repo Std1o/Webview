@@ -20,7 +20,7 @@ public class MyWebViewClient extends WebViewClient {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        Log.d(TAG, "URL地址:" + url);
+        Log.d(TAG, "onPageStarted: " + url);
         MainActivity.progressBar.setVisibility(View.VISIBLE);
         MainActivity.mWebView.setVisibility(View.GONE);
         super.onPageStarted(view, url, favicon);

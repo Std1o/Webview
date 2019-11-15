@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CHOOSE = 2;
     public static WebView mWebView;
     public static ProgressBar progressBar;
+    private String URL_STRING = "https://vk.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                         mWebView.goBack();
                     }
                 }
-                else if (url.startsWith("https://telegram.me/share")) {
+                else if (url.startsWith("https://telegram.me")) {
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             Uri.parse(url));
                     try {
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         mWebView.getSettings().setSupportZoom(true);
         mWebView.getSettings().setBuiltInZoomControls(true);//to remove the zoom buttons in webview
         mWebView.getSettings().setDisplayZoomControls(false);//to remove the zoom buttons in webview
-        mWebView.loadUrl("https://vk.com");
+        mWebView.loadUrl(URL_STRING);
     }
 
     @Override
