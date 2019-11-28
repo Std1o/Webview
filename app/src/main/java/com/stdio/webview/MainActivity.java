@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -17,8 +18,10 @@ import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 
-import static com.stdio.webview.WebViewHelper.afterChosePic;
-import static com.stdio.webview.WebViewHelper.cameraUri;
+import static com.stdio.webview.CustomWebChromeClient.cam_file_data;
+import static com.stdio.webview.CustomWebChromeClient.file_data;
+import static com.stdio.webview.CustomWebChromeClient.file_path;
+import static com.stdio.webview.CustomWebChromeClient.file_req_code;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,72 +47,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         CookieManager.getInstance().setAcceptCookie(true);
-        mWebView = (WebView) findViewById(R.id.maim_web);
-        mWebView.setWebViewClient(new MyWebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith("tel:")) {
-                    Intent intent = new Intent(Intent.ACTION_DIAL,
-                            Uri.parse(url));
-                    startActivity(intent);
-                } else if (url.startsWith("whatsapp://send?phone=")) {
-                    String url2 = "https://api.whatsapp.com/send?phone=" + url.replace("whatsapp://send?phone=", "");
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url2));
-                    intent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)
-                            .setPackage("com.whatsapp");
-                    try {
-                        startActivity(intent);
-                    }
-                    catch (ActivityNotFoundException e) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp")));
-                        mWebView.goBack();
-                    }
-                }
-                else if (url.startsWith("whatsapp://send?text=")) {
-                    Uri uri=Uri.parse(url);
-                    String msg = uri.getQueryParameter("text");
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
-                    sendIntent.setType("text/plain");
-                    sendIntent.setPackage("com.whatsapp");
-                    try {
-                        startActivity(sendIntent);
-                    }
-                    catch (ActivityNotFoundException e) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp")));
-                        mWebView.goBack();
-                    }
-                }
-                else if (url.startsWith("viber:")) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(url));
-                    try {
-                        startActivity(intent);
-                    }
-                    catch (ActivityNotFoundException e) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.viber.voip")));
-                        mWebView.goBack();
-                    }
-                }
-                else if (url.startsWith("https://telegram.me")) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(url));
-                    try {
-                        startActivity(intent);
-                    }
-                    catch (ActivityNotFoundException e) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=org.telegram.messenger")));
-                        mWebView.goBack();
-                    }
-                }
-                else if (url.startsWith("http:") || url.startsWith("https:")) {
-                    view.loadUrl(url);
-                }
-                return true;
-            }
-        });
-        mWebView.setWebChromeClient(new MyWebChromeClient(this, MainActivity.this));
+        mWebView = findViewById(R.id.maim_web);
+        mWebView.setWebViewClient(new MyWebViewClient(MainActivity.this));
+        mWebView.setWebChromeClient(new CustomWebChromeClient(MainActivity.this));
 
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setLoadWithOverviewMode(true);//loads the WebView completely zoomed out
@@ -132,25 +72,59 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
-        if (MyWebChromeClient.mUploadMessagesAboveL != null) {
-            new WebViewHelper(this, MainActivity.this).onActivityResultAboveL(requestCode, resultCode, intent);
-        }
-
-        if (MyWebChromeClient.mUploadMessage == null) return;
-
-        Uri uri = null;
-
-        if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK) {
-            uri = cameraUri;
-        }
-
-        if (requestCode == REQUEST_CHOOSE && resultCode == RESULT_OK) {
-            uri = afterChosePic(intent);
-        }
-
-        MyWebChromeClient.mUploadMessage.onReceiveValue(uri);
-        MyWebChromeClient.mUploadMessage = null;
         super.onActivityResult(requestCode, resultCode, intent);
+        if (Build.VERSION.SDK_INT >= 21) {
+            Uri[] results = null;
+
+            /*-- if file request cancelled; exited camera. we need to send null value to make future attempts workable --*/
+            if (resultCode == Activity.RESULT_CANCELED) {
+                if (requestCode == file_req_code) {
+                    file_path.onReceiveValue(null);
+                    return;
+                }
+            }
+
+            /*-- continue if response is positive --*/
+            if (resultCode == Activity.RESULT_OK) {
+                if (requestCode == file_req_code) {
+                    if (null == file_path) {
+                        return;
+                    }
+
+                    ClipData clipData;
+                    String stringData;
+                    try {
+                        clipData = intent.getClipData();
+                        stringData = intent.getDataString();
+                    } catch (Exception e) {
+                        clipData = null;
+                        stringData = null;
+                    }
+
+                    if (clipData == null && stringData == null && cam_file_data != null) {
+                        results = new Uri[]{Uri.parse(cam_file_data)};
+                    } else {
+                        if (clipData != null) { // checking if multiple files selected or not
+                            final int numSelectedFiles = clipData.getItemCount();
+                            results = new Uri[numSelectedFiles];
+                            for (int i = 0; i < clipData.getItemCount(); i++) {
+                                results[i] = clipData.getItemAt(i).getUri();
+                            }
+                        } else {
+                            results = new Uri[]{Uri.parse(stringData)};
+                        }
+                    }
+                }
+            }
+            file_path.onReceiveValue(results);
+            file_path = null;
+        } else {
+            if (requestCode == file_req_code) {
+                if (null == file_data) return;
+                Uri result = intent == null || resultCode != RESULT_OK ? null : intent.getData();
+                file_data.onReceiveValue(result);
+                file_data = null;
+            }
+        }
     }
 }
