@@ -62,6 +62,18 @@ public class MyWebViewClient extends WebViewClient {
                 MainActivity.mWebView.goBack();
             }
         }
+        else if (url.startsWith("https://api.whatsapp.com/send?phone=")) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            intent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)
+                    .setPackage("com.whatsapp");
+            try {
+                context.startActivity(intent);
+            }
+            catch (ActivityNotFoundException e) {
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp")));
+                MainActivity.mWebView.goBack();
+            }
+        }
         else if (url.startsWith("whatsapp://send?text=")) {
             Uri uri=Uri.parse(url);
             String msg = uri.getQueryParameter("text");
