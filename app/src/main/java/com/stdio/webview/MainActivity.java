@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Intent;
@@ -15,8 +16,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import static com.stdio.webview.CustomWebChromeClient.cam_file_data;
 import static com.stdio.webview.CustomWebChromeClient.file_data;
@@ -58,6 +62,37 @@ public class MainActivity extends AppCompatActivity {
         mWebView.getSettings().setSupportZoom(true);
         mWebView.getSettings().setBuiltInZoomControls(true);//to remove the zoom buttons in webview
         mWebView.getSettings().setDisplayZoomControls(false);//to remove the zoom buttons in webview
+
+        mWebView.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String
+                    contentDisposition, String mimetype, long contentLength) {
+                DownloadManager.Request request = new
+                        DownloadManager.Request(Uri.parse(url));
+                request.setMimeType(mimetype);
+                String cookies = CookieManager.getInstance().getCookie(url);
+                request.addRequestHeader("cookie", cookies);
+                request.addRequestHeader("User-Agent", userAgent);
+
+                request.setDescription("Description");
+                request.setTitle(URLUtil.guessFileName(url, contentDisposition,
+                        mimetype));
+                request.allowScanningByMediaScanner();
+
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                        URLUtil.guessFileName(url, contentDisposition, mimetype));
+                DownloadManager dm = (DownloadManager)
+                        getSystemService(DOWNLOAD_SERVICE);
+                try {
+                    dm.enqueue(request);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this,
+                            e.getMessage(),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         mWebView.loadUrl(URL_STRING);
     }
 
