@@ -30,8 +30,6 @@ import static com.stdio.webview.CustomWebChromeClient.file_req_code;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MainActivity";
-    public static final int REQUEST_CAMERA = 1;
-    public static final int REQUEST_CHOOSE = 2;
     public static WebView mWebView;
     public static ProgressBar progressBar;
     private String URL_STRING = "https://vk.com";
@@ -62,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         mWebView.getSettings().setSupportZoom(true);
         mWebView.getSettings().setBuiltInZoomControls(true);//to remove the zoom buttons in webview
         mWebView.getSettings().setDisplayZoomControls(false);//to remove the zoom buttons in webview
+        mWebView.getSettings().setDomStorageEnabled(true);
 
         mWebView.setDownloadListener(new DownloadListener() {
             @Override
