@@ -30,7 +30,6 @@ public class MyWebViewClient extends WebViewClient {
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         Log.d(TAG, "onPageStarted: " + url);
         MainActivity.progressBar.setVisibility(View.VISIBLE);
-        MainActivity.mWebView.setVisibility(View.GONE);
         super.onPageStarted(view, url, favicon);
     }
 
@@ -39,7 +38,6 @@ public class MyWebViewClient extends WebViewClient {
         Log.i(TAG, "onPageFinished");
         CookieSyncManager.getInstance().sync();
         MainActivity.progressBar.setVisibility(View.GONE);
-        MainActivity.mWebView.setVisibility(View.VISIBLE);
         super.onPageFinished(view, url);
     }
 
