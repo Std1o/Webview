@@ -26,7 +26,7 @@ import java.util.Date;
 public class CustomWebChromeClient extends WebChromeClient {
 
     private Activity context;
-    private static String file_type = "image/*";    // file types to be allowed for upload
+    private static String file_type     = "*/*";    // file types to be allowed for upload
     private boolean multiple_files = true;         // allowing multiple file upload
     public static String cam_file_data = null;        // for storing camera file information
     public static ValueCallback<Uri> file_data;       // data/header received after file selection
