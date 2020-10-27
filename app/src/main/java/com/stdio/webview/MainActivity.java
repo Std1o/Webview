@@ -8,13 +8,16 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
@@ -39,7 +42,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         progressBar = findViewById(R.id.progressBar);
-        initView();
+        if (isNetworkConnected()) {
+            initView();
+        } else {
+            mWebView = findViewById(R.id.maim_web);
+            mWebView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
     private void initView() {

@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/tvOffline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Нет подключеия к интернету" />
+
     <WebView
         android:id="@+id/maim_web"
         android:layout_width="match_parent"
