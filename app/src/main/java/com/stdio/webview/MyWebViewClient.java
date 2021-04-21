@@ -62,7 +62,7 @@ public class MyWebViewClient extends WebViewClient {
                 MainActivity.mWebView.goBack();
             }
         }
-        else if (url.startsWith("https://api.whatsapp.com/send?phone=")) {
+        else if (url.startsWith("https://api.whatsapp.com/send?phone=")|| url.startsWith("https://api.whatsapp.com/send/?phone=")) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             intent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)
                     .setPackage("com.whatsapp");
