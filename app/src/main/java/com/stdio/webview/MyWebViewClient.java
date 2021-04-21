@@ -101,7 +101,7 @@ public class MyWebViewClient extends WebViewClient {
                 MainActivity.mWebView.goBack();
             }
         }
-        else if (url.startsWith("https://telegram.me")) {
+        else if (url.startsWith("https://telegram.me") || url.startsWith("https://t.me")) {
             Intent intent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse(url));
             try {
