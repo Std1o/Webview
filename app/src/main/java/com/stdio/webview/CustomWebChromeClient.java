@@ -6,14 +6,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -32,9 +36,47 @@ public class CustomWebChromeClient extends WebChromeClient {
     public static ValueCallback<Uri> file_data;       // data/header received after file selection
     public static ValueCallback<Uri[]> file_path;     // received file(s) temp. location
     public final static int file_req_code = 1;
+    private View mCustomView;
+    private WebChromeClient.CustomViewCallback mCustomViewCallback;
+    protected FrameLayout mFullscreenContainer;
+    private int mOriginalOrientation;
+    private int mOriginalSystemUiVisibility;
 
     public CustomWebChromeClient(Activity context) {
         this.context = context;
+    }
+
+    public Bitmap getDefaultVideoPoster()
+    {
+        if (mCustomView == null) {
+            return null;
+        }
+        return BitmapFactory.decodeResource(context.getResources(), 2130837573);
+    }
+
+    public void onHideCustomView()
+    {
+        ((FrameLayout)context.getWindow().getDecorView()).removeView(this.mCustomView);
+        this.mCustomView = null;
+        context.getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
+        context.setRequestedOrientation(this.mOriginalOrientation);
+        this.mCustomViewCallback.onCustomViewHidden();
+        this.mCustomViewCallback = null;
+    }
+
+    public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback)
+    {
+        if (this.mCustomView != null)
+        {
+            onHideCustomView();
+            return;
+        }
+        this.mCustomView = paramView;
+        this.mOriginalSystemUiVisibility = context.getWindow().getDecorView().getSystemUiVisibility();
+        this.mOriginalOrientation = context.getRequestedOrientation();
+        this.mCustomViewCallback = paramCustomViewCallback;
+        ((FrameLayout)context.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
+        context.getWindow().getDecorView().setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
     }
 
     /*-- handling input[type="file"] requests for android API 21+ --*/

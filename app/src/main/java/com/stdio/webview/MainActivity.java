@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
     public static WebView mWebView;
     public static ProgressBar progressBar;
-    private String URL_STRING = "https://vk.com";
+    private String URL_STRING = "https://hdkinorus.ru/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         mWebView.getSettings().setBuiltInZoomControls(true);//to remove the zoom buttons in webview
         mWebView.getSettings().setDisplayZoomControls(false);//to remove the zoom buttons in webview
         mWebView.getSettings().setDomStorageEnabled(true);
+        mWebView.getSettings().setAllowFileAccess(true);
         mWebView.getSettings().setAppCacheEnabled(true);
         mWebView.getSettings().setLoadsImagesAutomatically(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -181,5 +182,17 @@ public class MainActivity extends AppCompatActivity {
                 file_data = null;
             }
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mWebView.saveState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mWebView.restoreState(savedInstanceState);
     }
 }
